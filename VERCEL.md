@@ -1,11 +1,17 @@
 # Run and Deploy Nathra on Vercel
 
-This repo now has a Vercel-friendly shape:
+This repo now has a Vercel-friendly shape for the demo app:
 
 - `index.html`, `src/app.js`, `src/styles.css`: static frontend
 - `api/predict.py`: Vercel Python serverless function
 - `predictor.py`: shared validation and model prediction logic
-- `model/model.pkl` and `model/scaler.pkl`: required trained artifacts, not currently committed
+- `model/demo_model.json`: marks the deployed app as demo-only
+
+The deployed Vercel API intentionally avoids `scikit-learn` and pickle loading.
+That keeps the demo deploy reliable on Vercel. For a real trained model, host
+the Python ML inference API on Hugging Face Spaces, Render, Railway, Fly.io, or
+another backend that is built for Python ML dependencies, then call that API from
+the Vercel frontend.
 
 ## Local Run
 
@@ -21,12 +27,11 @@ Open:
 http://127.0.0.1:3000
 ```
 
-The UI will load even before the model exists. Predictions return
-`model_not_configured` until these files are added:
+The UI will load even before the model metadata exists. Predictions return
+`model_not_configured` until this file exists:
 
 ```text
-model/model.pkl
-model/scaler.pkl
+model/demo_model.json
 ```
 
 ## Export The Model
@@ -52,8 +57,9 @@ model/scaler.pkl
 model/demo_model.json
 ```
 
-Do not use this model for medical claims. It is trained on synthetic data and is
-only useful for UI, API, and deployment testing.
+Do not use this model for medical claims. It is synthetic and only useful for UI,
+API, and deployment testing. The Vercel API uses a lightweight standard-library
+demo scoring function so deployment does not depend on binary ML packages.
 
 If you have `trainTest.csv`, run:
 
@@ -125,10 +131,11 @@ curl -X POST http://127.0.0.1:3000/api/predict \
 3. Keep the default framework setting as static/other if Vercel does not detect one.
 4. Deploy.
 
-Vercel's Python runtime is currently beta. It detects Python apps from supported
-entrypoints and reads dependencies from `requirements.txt`; it also supports
-Python 3.12, 3.13, and 3.14. The Python function bundle limit is 500 MB
-uncompressed, so keep runtime dependencies tight.
+Vercel's Python runtime is currently beta. It supports `/api/*.py` functions with
+`BaseHTTPRequestHandler`, reads dependencies from `requirements.txt`, and
+supports Python 3.12, 3.13, and 3.14. The Python function bundle limit is 500 MB
+uncompressed, so keep runtime dependencies tight. This demo uses no third-party
+runtime dependencies on Vercel.
 
 ## Production Gaps
 

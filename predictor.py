@@ -2,7 +2,6 @@ from functools import lru_cache
 import json
 import os
 from pathlib import Path
-import pickle
 
 
 FEATURES = [
@@ -70,12 +69,7 @@ def load_artifacts():
             f"Missing {', '.join(missing)} artifact(s). Expected files: {expected}"
         )
 
-    with paths["model"].open("rb") as model_file:
-        model = pickle.load(model_file)
-    with paths["scaler"].open("rb") as scaler_file:
-        scaler = pickle.load(scaler_file)
-
-    return model, scaler
+    return required_paths
 
 
 def validate_payload(payload):
@@ -159,16 +153,41 @@ def risk_message(prediction, probability):
     }
 
 
+def demo_probability(values):
+    score = -4.0
+    score += (values["age"] - 50) * 0.035
+    score += 0.35 if values["sex"] == 1 else 0
+    score += [0.45, 0.2, -0.15, 0.65][values["cp"]]
+    score += (values["trestbps"] - 120) * 0.012
+    score += (values["chol"] - 200) * 0.006
+    score += 0.35 if values["fbs"] == 1 else 0
+    score += 0.2 if values["restecg"] > 0 else 0
+    score += (145 - values["thalach"]) * 0.018
+    score += 0.8 if values["exang"] == 1 else 0
+    score += values["oldpeak"] * 0.45
+    score += [0, 0.45, 0.75][values["slope"]]
+    score += values["ca"] * 0.55
+    score += [0, 0.35, 0.5, 0.25][values["thal"]]
+
+    # Logistic transform without importing numpy/scikit-learn.
+    probability = 1 / (1 + pow(2.718281828459045, -score))
+    return max(0.01, min(0.99, probability))
+
+
 def predict(payload):
     values = validate_payload(payload)
-    model, scaler = load_artifacts()
-
-    features = [[values[name] for name in FEATURE_ORDER]]
-    scaled_features = scaler.transform(features)
-    prediction = int(model.predict(scaled_features)[0])
-    probability = float(model.predict_proba(scaled_features)[0][1])
-    risk = risk_message(prediction, probability)
     artifact_metadata = model_metadata()
+
+    if artifact_metadata.get("mode") != "demo":
+        load_artifacts()
+        raise ModelNotConfigured(
+            "The Vercel demo API only supports demo_model.json. "
+            "Deploy real scikit-learn model inference on Hugging Face, Render, or another Python ML backend."
+        )
+
+    probability = demo_probability(values)
+    prediction = int(probability >= 0.5)
+    risk = risk_message(prediction, probability)
     demo_disclaimer = (
         "This is a synthetic demo model for app development only. It is not medically valid."
         if artifact_metadata.get("mode") == "demo"
@@ -192,10 +211,10 @@ def predict(payload):
 
 def metadata():
     paths = model_paths()
-    configured = paths["model"].exists() and paths["scaler"].exists()
-    artifact_metadata = model_metadata() if configured else {"mode": "missing", "warning": None}
+    demo_configured = paths["demo_metadata"].exists()
+    artifact_metadata = model_metadata() if demo_configured else {"mode": "missing", "warning": None}
     return {
-        "status": "ready" if configured else "model_not_configured",
+        "status": "ready" if demo_configured else "model_not_configured",
         "model": artifact_metadata,
         "featureOrder": FEATURE_ORDER,
         "features": FEATURES,
