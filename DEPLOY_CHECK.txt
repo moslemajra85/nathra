@@ -1,0 +1,3 @@
+Vercel should deploy commit after pyproject entrypoint fix.
+Expected repo: moslemajra85/nathra
+Expected root directory: ./
