@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/predict",
+      "destination": "/api/predict.py"
+    }
+  ],
+  "functions": {
+    "api/**/*.py": {
+      "excludeFiles": "{PIM_Finale_(1).ipynb,huggingface_deployment/**,README.md,DEPLOY.md}"
+    }
+  }
+}

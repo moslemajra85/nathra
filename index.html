@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nathra Heart Risk Predictor</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div class="page-glow glow-one"></div>
+    <div class="page-glow glow-two"></div>
+
+    <main class="app-shell">
+      <header class="topbar" aria-label="Application header">
+        <a class="brand" href="/" aria-label="Nathra home">
+          <span class="brand-mark"></span>
+          <span>Nathra</span>
+        </a>
+        <div class="topbar-actions">
+          <span class="status-dot" id="model-dot"></span>
+          <span id="model-status">Checking model status...</span>
+        </div>
+      </header>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Clinical ML risk preview</p>
+          <h1>Heart risk analysis with a calm, clinical interface.</h1>
+          <p>
+            Enter patient indicators, review the risk signal, and keep the
+            limitations visible. This interface is designed for clear decision
+            support, not diagnosis.
+          </p>
+          <div class="hero-metrics" aria-label="App qualities">
+            <div>
+              <strong>13</strong>
+              <span>clinical inputs</span>
+            </div>
+            <div>
+              <strong>&lt;1s</strong>
+              <span>local response</span>
+            </div>
+            <div>
+              <strong>API</strong>
+              <span>Vercel-ready</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="pulse-card">
+            <div class="orbital">
+              <span></span>
+              <span></span>
+              <span></span>
+              <div class="heart-core">
+                <div class="ecg-line"></div>
+              </div>
+            </div>
+            <div class="mini-readout">
+              <span>Signal quality</span>
+              <strong>Ready</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <form id="prediction-form" class="prediction-form" novalidate>
+          <div class="form-header">
+            <div>
+              <p class="eyebrow">Patient profile</p>
+              <h2>Risk factors</h2>
+            </div>
+            <div class="progress-pill">
+              <span id="form-progress">13 of 13 complete</span>
+            </div>
+          </div>
+
+          <div class="field-section">
+            <div class="section-title">
+              <span>01</span>
+              <div>
+                <h3>Demographics</h3>
+                <p>Core patient context used by the model.</p>
+              </div>
+            </div>
+            <div class="form-grid">
+              <label>
+                <span>Age</span>
+                <input name="age" type="number" min="1" max="120" value="50" required />
+              </label>
+
+              <label>
+                <span>Sex</span>
+                <select name="sex">
+                  <option value="1">Male</option>
+                  <option value="0">Female</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="field-section">
+            <div class="section-title">
+              <span>02</span>
+              <div>
+                <h3>Vitals and labs</h3>
+                <p>Blood pressure, cholesterol, glucose, and exercise response.</p>
+              </div>
+            </div>
+            <div class="form-grid">
+              <label>
+                <span>Resting blood pressure</span>
+                <input name="trestbps" type="number" min="60" max="250" value="120" required />
+              </label>
+
+              <label>
+                <span>Cholesterol</span>
+                <input name="chol" type="number" min="80" max="700" value="200" required />
+              </label>
+
+              <label>
+                <span>Fasting blood sugar &gt; 120</span>
+                <select name="fbs">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Maximum heart rate</span>
+                <input name="thalach" type="number" min="40" max="230" value="150" required />
+              </label>
+            </div>
+          </div>
+
+          <div class="field-section">
+            <div class="section-title">
+              <span>03</span>
+              <div>
+                <h3>Cardiac findings</h3>
+                <p>Encoded observations from ECG, chest pain, and stress response.</p>
+              </div>
+            </div>
+            <div class="form-grid">
+              <label>
+                <span>Chest pain type</span>
+                <select name="cp">
+                  <option value="0">0 - Typical angina</option>
+                  <option value="1">1 - Atypical angina</option>
+                  <option value="2">2 - Non-anginal pain</option>
+                  <option value="3">3 - Asymptomatic</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Resting ECG</span>
+                <select name="restecg">
+                  <option value="0">0 - Normal</option>
+                  <option value="1">1 - ST-T abnormality</option>
+                  <option value="2">2 - LV hypertrophy</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Exercise induced angina</span>
+                <select name="exang">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </label>
+
+              <label>
+                <span>ST depression</span>
+                <input name="oldpeak" type="number" min="0" max="10" step="0.1" value="0.0" required />
+              </label>
+
+              <label>
+                <span>ST slope</span>
+                <select name="slope">
+                  <option value="0">0 - Upsloping</option>
+                  <option value="1">1 - Flat</option>
+                  <option value="2">2 - Downsloping</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Major vessels</span>
+                <select name="ca">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </label>
+
+              <label class="wide-field">
+                <span>Thalassemia</span>
+                <select name="thal">
+                  <option value="1">1 - Fixed defect</option>
+                  <option value="2">2 - Reversible defect</option>
+                  <option value="3">3 - Unknown</option>
+                  <option value="0">0 - Normal</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" id="submit-button">
+            <span>Predict risk</span>
+            <span class="button-arrow" aria-hidden="true">&gt;</span>
+          </button>
+        </form>
+
+        <aside class="result-panel" aria-live="polite">
+          <div class="result-shell">
+            <p class="eyebrow">Prediction result</p>
+            <div id="result" class="waiting">
+              <div class="risk-meter" style="--risk: 0">
+                <div>
+                  <strong>--</strong>
+                  <span>probability</span>
+                </div>
+              </div>
+              <h2>Ready for analysis</h2>
+              <p>Submit the form to generate a risk signal.</p>
+            </div>
+          </div>
+
+          <div class="trust-panel">
+            <h3>Responsible use</h3>
+            <p>
+              Results support conversation and learning. They do not replace
+              clinical judgment or professional care.
+            </p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="disclaimer">
+        <strong>Medical disclaimer:</strong>
+        This app is for education and portfolio demonstration only. It is not a
+        diagnostic tool and should never replace a clinician.
+      </section>
+    </main>
+
+    <script src="/src/app.js" type="module"></script>
+  </body>
+</html>
