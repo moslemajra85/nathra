@@ -5,10 +5,5 @@
       "source": "/api/predict",
       "destination": "/api/predict.py"
     }
-  ],
-  "functions": {
-    "api/**/*.py": {
-      "excludeFiles": "{PIM_Finale_(1).ipynb,huggingface_deployment/**,README.md,DEPLOY.md,VERCEL.md,tests/**,scripts/**,model/*.pkl}"
-    }
-  }
+  ]
 }
